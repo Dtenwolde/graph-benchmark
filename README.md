@@ -98,24 +98,21 @@ The following questions are asked of both graphs:
 
 ## High-level results
 
-| Query | neo4j-2025.12.1 (ms) | duckpgq-1.5.6 (ms) | kuzu-0.11.3 (ms) | ladybug-0.15.3 (ms) | lance-graph-0.5.4 (ms) |
-| --- | --- | --- | --- | --- | --- |
-| q1 | 1552.0ms | 8.8ms (176.6x) | 138.0ms (11.2x) | 152.7ms (10.2x) | 21.5ms (72.0x) |
-| q2 | 395.0ms | 5.5ms (71.4x) | 227.9ms (1.7x) | 235.7ms (1.7x) | 44.4ms (8.9x) |
-| q3 | 39.1ms | 4.1ms (9.5x) | 6.4ms (6.1x) | 7.1ms (5.5x) | 7.0ms (5.6x) |
-| q4 | 38.3ms | 2.6ms (14.5x) | 9.7ms (3.9x) | 10.5ms (3.6x) | 4.9ms (7.8x) |
-| q5 | 7.7ms | 2.1ms (3.7x) | 10.6ms (0.7x) | 12.0ms (0.6x) | 4.8ms (1.6x) |
-| q6 | 21.2ms | 2.8ms (7.4x) | 27.3ms (0.8x) | 31.4ms (0.7x) | 5.4ms (3.9x) |
-| q7 | 117.4ms | 2.7ms (43.4x) | 11.2ms (10.5x) | 12.4ms (9.5x) | 6.7ms (17.6x) |
-| q8 | 2831.2ms | 166.5ms (17.0x) | 6.5ms (435.3x) | 7.3ms (385.8x) | 126.2ms (22.4x) |
-| q9 | 2986.7ms | 158.5ms (18.8x) | 86.1ms (34.7x) | 95.2ms (31.4x) | 111.7ms (26.7x) |
+| Query | neo4j-2025.12.1 (ms) | kuzu-0.11.3 (ms) | ladybug-0.15.3 (ms) | lance-graph-0.5.4 (ms) |
+| --- | --- | --- | --- | --- |
+| q1 | 1552.0ms | 138.0ms (11.2x) | 152.7ms (10.2x) | 21.5ms (72.0x) |
+| q2 | 395.0ms | 227.9ms (1.7x) | 235.7ms (1.7x) | 44.4ms (8.9x) |
+| q3 | 39.1ms | 6.4ms (6.1x) | 7.1ms (5.5x) | 7.0ms (5.6x) |
+| q4 | 38.3ms | 9.7ms (3.9x) | 10.5ms (3.6x) | 4.9ms (7.8x) |
+| q5 | 7.7ms | 10.6ms (0.7x) | 12.0ms (0.6x) | 4.8ms (1.6x) |
+| q6 | 21.2ms | 27.3ms (0.8x) | 31.4ms (0.7x) | 5.4ms (3.9x) |
+| q7 | 117.4ms | 11.2ms (10.5x) | 12.4ms (9.5x) | 6.7ms (17.6x) |
+| q8 | 2831.2ms | 6.5ms (435.3x) | 7.3ms (385.8x) | 126.2ms (22.4x) |
+| q9 | 2986.7ms | 86.1ms (34.7x) | 95.2ms (31.4x) | 111.7ms (26.7x) |
 
 ![](./results/benchmark_plot.png)
 
 > 🔥 The n-hop path-finding queries (8 and 9) in Kuzu/Ladybug benefit from hybrid joins (WCOJ + binary) and factorization, which are query processing innovations described in the [Kùzu research paper](https://www.cidrdb.org/cidr2023/papers/p48-jin.pdf).
-
-> [!NOTE]
-> The DuckPGQ numbers were measured on a different machine (M5 Pro, 48 GB) than the other systems (M3, 32 GB). On the same machine, Ladybug 0.15.3 ran roughly 15-25% faster than the numbers in the table above, so treat small differences across systems with caution.
 
 ## Explanation of results
 
