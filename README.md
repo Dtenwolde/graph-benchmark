@@ -2,14 +2,14 @@
 
 This repo was originally a benchmark for Kuzu described in this [blog post](https://thedataquarry.com/posts/embedded-db-2/). Since October 2025, Kuzu has been archived and is no longer maintained. Kuzu is now succeeded by a fork, [Ladybug](https://github.com/LadybugDB/ladybug), maintained by @adsharma.
 
-The benchmarks below are updated to compare multi-hop retrieval performance across newer systems like Ladybug and [lance-graph](https://github.com/lance-format/lance-graph),
-an open source graph engine built in Rust on top of the Lance format.
+The benchmarks below are updated to compare multi-hop retrieval performance across newer systems like Ladybug, [lance-graph](https://github.com/lance-format/lance-graph),
+an open source graph engine built in Rust on top of the Lance format, and [DuckPGQ](https://duckpgq.org/), a community extension that adds SQL/PGQ graph pattern matching to [DuckDB](https://duckdb.org/).
 
 It does the following:
 
 * Generate an artificial social network dataset, including persons, interests and locations
   * You can scale up the size of the artificial dataset using the scripts provided and test query performance on larger graphs
-* Ingest the dataset into two graph databases: Kuzu and Neo4j (community edition)
+* Ingest the dataset into several graph systems: Neo4j (community edition), Kuzu, Ladybug, lance-graph and DuckDB + DuckPGQ
 * Run a set of queries that compare the query performance on a suite of queries that involve multi-hop traversals or top-k results with filters and aggregations
 
 ## Setup
@@ -82,7 +82,7 @@ The generated dataset produces a rich and well-connected graph, a subgraph of wh
 
 ## Run the queries
 
-Some sample queries are run in each DB to verify that the data is ingested correctly, and that the results are consistent with one another.
+Some sample queries are run in each DB to verify that the data is ingested correctly, and that the results are consistent with one another. The queries are written in Cypher for Neo4j, Kuzu, Ladybug and lance-graph, and in SQL/PGQ for DuckPGQ.
 
 The following questions are asked of both graphs:
 
@@ -98,21 +98,24 @@ The following questions are asked of both graphs:
 
 ## High-level results
 
-| Query | neo4j-2025.12.1 (ms) | kuzu-0.11.3 (ms) | ladybug-0.15.3 (ms) | lance-graph-0.5.4 (ms) |
-| --- | --- | --- | --- | --- |
-| q1 | 1552.0ms | 138.0ms (11.2x) | 152.7ms (10.2x) | 21.5ms (72.0x) |
-| q2 | 395.0ms | 227.9ms (1.7x) | 235.7ms (1.7x) | 44.4ms (8.9x) |
-| q3 | 39.1ms | 6.4ms (6.1x) | 7.1ms (5.5x) | 7.0ms (5.6x) |
-| q4 | 38.3ms | 9.7ms (3.9x) | 10.5ms (3.6x) | 4.9ms (7.8x) |
-| q5 | 7.7ms | 10.6ms (0.7x) | 12.0ms (0.6x) | 4.8ms (1.6x) |
-| q6 | 21.2ms | 27.3ms (0.8x) | 31.4ms (0.7x) | 5.4ms (3.9x) |
-| q7 | 117.4ms | 11.2ms (10.5x) | 12.4ms (9.5x) | 6.7ms (17.6x) |
-| q8 | 2831.2ms | 6.5ms (435.3x) | 7.3ms (385.8x) | 126.2ms (22.4x) |
-| q9 | 2986.7ms | 86.1ms (34.7x) | 95.2ms (31.4x) | 111.7ms (26.7x) |
+| Query | neo4j-2025.12.1 (ms) | duckpgq-1.5.6 (ms) | kuzu-0.11.3 (ms) | ladybug-0.15.3 (ms) | lance-graph-0.5.4 (ms) |
+| --- | --- | --- | --- | --- | --- |
+| q1 | 1552.0ms | 8.8ms (176.6x) | 138.0ms (11.2x) | 152.7ms (10.2x) | 21.5ms (72.0x) |
+| q2 | 395.0ms | 5.5ms (71.4x) | 227.9ms (1.7x) | 235.7ms (1.7x) | 44.4ms (8.9x) |
+| q3 | 39.1ms | 4.1ms (9.5x) | 6.4ms (6.1x) | 7.1ms (5.5x) | 7.0ms (5.6x) |
+| q4 | 38.3ms | 2.6ms (14.5x) | 9.7ms (3.9x) | 10.5ms (3.6x) | 4.9ms (7.8x) |
+| q5 | 7.7ms | 2.1ms (3.7x) | 10.6ms (0.7x) | 12.0ms (0.6x) | 4.8ms (1.6x) |
+| q6 | 21.2ms | 2.8ms (7.4x) | 27.3ms (0.8x) | 31.4ms (0.7x) | 5.4ms (3.9x) |
+| q7 | 117.4ms | 2.7ms (43.4x) | 11.2ms (10.5x) | 12.4ms (9.5x) | 6.7ms (17.6x) |
+| q8 | 2831.2ms | 166.5ms (17.0x) | 6.5ms (435.3x) | 7.3ms (385.8x) | 126.2ms (22.4x) |
+| q9 | 2986.7ms | 158.5ms (18.8x) | 86.1ms (34.7x) | 95.2ms (31.4x) | 111.7ms (26.7x) |
 
 ![](./results/benchmark_plot.png)
 
 > 🔥 The n-hop path-finding queries (8 and 9) in Kuzu/Ladybug benefit from hybrid joins (WCOJ + binary) and factorization, which are query processing innovations described in the [Kùzu research paper](https://www.cidrdb.org/cidr2023/papers/p48-jin.pdf).
+
+> [!NOTE]
+> The DuckPGQ numbers were measured on a different machine (M5 Pro, 48 GB) than the other systems (M3, 32 GB). On the same machine, Ladybug 0.15.3 ran roughly 15-25% faster than the numbers in the table above, so treat small differences across systems with caution.
 
 ## Explanation of results
 
